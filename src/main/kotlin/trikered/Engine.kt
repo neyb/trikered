@@ -7,7 +7,8 @@ class Engine {
     private var defaultConfigurations = mutableListOf<ChangelogConfigurationBuilder.() -> Unit>(
             { "default" bindedAs on_event })
 
-    @JvmOverloads fun <T : Event> listen(
+    @JvmOverloads
+    fun <T : Event> listen(
             eventClass: Class<T>,
             registerName: String = "default",
             type: BindingType? = null,
@@ -19,9 +20,12 @@ class Engine {
     }
 
     fun createChangelog(configuration: ChangelogConfigurationBuilder.() -> Unit = { bindDefault() }) =
-            ChangelogConfigurationBuilder(this, { defaultConfigurations.forEach { it() } }).apply(configuration).createChangelog()
+            ChangelogConfigurationBuilder(this) { defaultConfigurations.forEach { it() } }
+                    .apply(configuration)
+                    .createChangelog(registers.toList())
 
-    internal fun bindingFor(registerName: String, type: BindingType) =
+
+    fun bindingFor(registerName: String, type: BindingType) =
             Binding(type, getOrCreateRegister(registerName))
 
     private fun getOrCreateRegister(registerName: String) =

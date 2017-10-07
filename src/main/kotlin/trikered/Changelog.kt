@@ -1,22 +1,32 @@
 package trikered
 
-class Changelog(private val bindings: List<Binding>) {
+class Changelog(
+        private val bindings: List<Binding>,
+        private val registers: List<Register>) {
     private val events = mutableListOf<Event>()
 
     fun add(event: Event) {
-        trigger(BindingType.on_event, event)
         events += event
+        bindings.filter { it.type == BindingType.on_event }
+                .forEach { it.register.trigger(event) }
     }
 
-    fun trigger() {
-        events.forEach { trigger(BindingType.on_trigger, it) }
+    fun trigger(vararg registerNames: String) =
+            if (registerNames.isEmpty()) triggerOnTriggerAndClear()
+            else triggerNamedAndClear(registerNames)
+
+    private fun triggerOnTriggerAndClear() = triggerAndClear(bindings
+            .filter { it.type == BindingType.on_trigger }
+            .map { it.register })
+
+    private fun triggerNamedAndClear(registerNames: Array<out String>) =
+            triggerAndClear(registers.filter { it.name in registerNames })
+
+    private fun triggerAndClear(registers: List<Register>) {
+        events.forEach { event -> registers.forEach { it.trigger(event) } }
         events.clear()
     }
 
-    private fun trigger(type: BindingType, event: Event) =
-            bindings.asSequence()
-                    .filter { it.type == type }
-                    .forEach { it.register.trigger(event) }
 
     override fun toString() = "${events.size} events, ${bindings.size} bindings"
 }

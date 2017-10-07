@@ -87,4 +87,18 @@ class BindingTypeTest {
         coldCalled shouldEqual 3
         hotCalled shouldEqual 2
     }
+
+    @Test fun `can specify register when triggering`() {
+        val calls = mutableListOf<String>()
+
+        engine.listen(MyEvent::class.java, "register1") { calls += "listener1" }
+        engine.listen(MyEvent::class.java, "register2") { calls += "listener2" }
+        val changelog = engine.createChangelog {}
+        changelog.add(MyEvent())
+
+        changelog.trigger("register1")
+
+        calls shouldEqual listOf("listener1")
+
+    }
 }

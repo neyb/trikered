@@ -11,7 +11,7 @@ class ChangelogConfigurationBuilder(private val engine: Engine, private val defa
             bindings += engine.bindingFor(this, type)
     }
 
-    fun createChangelog() = Changelog(bindings.toList())
+    internal fun createChangelog(registers: List<Register>) = Changelog(bindings.toList(), registers)
 
     private fun containsBinding(registerName: String, type: BindingType) =
             bindings.any { it.type == type && it.register.name == registerName }
