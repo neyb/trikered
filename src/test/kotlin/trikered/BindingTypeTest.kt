@@ -12,7 +12,7 @@ class BindingTypeTest {
 
     @Test fun `a cold binding should be called only on trigger`() {
         var called = false
-        engine.listen(MyEvent::class.java) { called = true }
+        engine.listen<MyEvent> { called = true }
 
         val changelog = engine.createChangelog {
             "default" bindedAs on_trigger
@@ -27,7 +27,7 @@ class BindingTypeTest {
 
     @Test fun `calling twice trigger should be ignored`() {
         var called = 0
-        engine.listen(MyEvent::class.java) { called += 1 }
+        engine.listen<MyEvent> { called += 1 }
 
         val changelog = engine.createChangelog {
             "default" bindedAs on_trigger
@@ -45,13 +45,13 @@ class BindingTypeTest {
 
     @Test fun `mixing on_trigger and on_event should work`() {
         var coldCalled = 0
-        engine.listen(MyEvent::class.java, "cold register") { coldCalled += 1 }
-        engine.listen(MyEvent::class.java, "cold register") { coldCalled += 1 }
-        engine.listen(MyEvent::class.java, "cold register") { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register") { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register") { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register") { coldCalled += 1 }
 
         var hotCalled = 0
-        engine.listen(MyEvent::class.java, "hot register") { hotCalled += 1 }
-        engine.listen(MyEvent::class.java, "hot register") { hotCalled += 1 }
+        engine.listen<MyEvent>("hot register") { hotCalled += 1 }
+        engine.listen<MyEvent>("hot register") { hotCalled += 1 }
 
         val changelog = engine.createChangelog {
             "cold register" bindedAs on_trigger
@@ -69,13 +69,13 @@ class BindingTypeTest {
 
     @Test fun `a default configuration can be set when adding listener`() {
         var coldCalled = 0
-        engine.listen(MyEvent::class.java, "cold register", on_trigger) { coldCalled += 1 }
-        engine.listen(MyEvent::class.java, "cold register", on_trigger) { coldCalled += 1 }
-        engine.listen(MyEvent::class.java, "cold register", on_trigger) { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register", on_trigger) { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register", on_trigger) { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register", on_trigger) { coldCalled += 1 }
 
         var hotCalled = 0
-        engine.listen(MyEvent::class.java, "hot register", on_event) { hotCalled += 1 }
-        engine.listen(MyEvent::class.java, "hot register", on_event) { hotCalled += 1 }
+        engine.listen<MyEvent>("hot register", on_event) { hotCalled += 1 }
+        engine.listen<MyEvent>("hot register", on_event) { hotCalled += 1 }
 
         val changelog = engine.createChangelog()
 
@@ -91,8 +91,8 @@ class BindingTypeTest {
     @Test fun `can specify register when triggering`() {
         val calls = mutableListOf<String>()
 
-        engine.listen(MyEvent::class.java, "register1") { calls += "listener1" }
-        engine.listen(MyEvent::class.java, "register2") { calls += "listener2" }
+        engine.listen<MyEvent>("register1") { calls += "listener1" }
+        engine.listen<MyEvent>("register2") { calls += "listener2" }
         val changelog = engine.createChangelog {}
         changelog.add(MyEvent())
 

@@ -12,10 +12,7 @@ class ToStringTest {
     @Test fun `changelog`() {
         class MyEvent : Event
 
-        val changelog = Engine()
-                .listen(BasicEngineTest.MyEvent::class.java) { println("do stuff") }
-                .createChangelog()
-
+        val changelog = Engine().listen<MyEvent> {}.createChangelog()
         changelog.add(MyEvent())
         changelog.toString() shouldEqual "1 events, 1 bindings"
     }

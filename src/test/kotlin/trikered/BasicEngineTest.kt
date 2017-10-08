@@ -14,7 +14,11 @@ class BasicEngineTest {
     }
 
     @Test fun `can add listener on Event`() {
-        engine.listen(MyEvent::class.java) { println("do stuff") }
+        engine.listen<MyEvent> { println("do stuff") }
+    }
+
+    @Test fun `can add listener on Event with kotlin syntax`() {
+        engine.listen<MyEvent> { println("do stuff") }
     }
 
     @Test fun `engine can create a changelog`() {
@@ -23,7 +27,7 @@ class BasicEngineTest {
 
     @Test fun `adding a listener and calling it through event`() {
         var called = false
-        engine.listen(MyEvent::class.java) { called = true }
+        engine.listen<MyEvent> { called = true }
 
         engine.createChangelog().add(MyEvent())
 
@@ -32,7 +36,7 @@ class BasicEngineTest {
 
     @Test fun `an event should have a instant`() {
         var instant: Instant? = null
-        engine.listen(MyEvent::class.java) { instant = it.instant }
+        engine.listen<MyEvent> { instant = it.instant }
         engine.createChangelog().add(MyEvent())
 
         instant shouldNotBe null
@@ -42,7 +46,7 @@ class BasicEngineTest {
 
     @Test fun `listener can access typed event`() {
         var called = false
-        engine.listen(MyTypedSubjectEvent::class.java) {
+        engine.listen<MyTypedSubjectEvent> {
             it.subject shouldEqual "message"
             called = true
         }
@@ -55,8 +59,8 @@ class BasicEngineTest {
 
     @Test fun `several listeners are called in order`() {
         val calls = mutableListOf<String>()
-        engine.listen(MyEvent::class.java) { calls += "event1" }
-        engine.listen(MyEvent::class.java) { calls += "event2" }
+        engine.listen<MyEvent> { calls += "event1" }
+        engine.listen<MyEvent> { calls += "event2" }
 
         engine.createChangelog().add(MyEvent())
 
