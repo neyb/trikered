@@ -67,15 +67,18 @@ class BindingTypeTest {
         hotCalled shouldEqual 2
     }
 
-    @Test fun `a default configuration can be set when adding listener`() {
+    @Test fun `a default configuration can be set`() {
         var coldCalled = 0
-        engine.listen<MyEvent>("cold register", on_trigger) { coldCalled += 1 }
-        engine.listen<MyEvent>("cold register", on_trigger) { coldCalled += 1 }
-        engine.listen<MyEvent>("cold register", on_trigger) { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register") { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register") { coldCalled += 1 }
+        engine.listen<MyEvent>("cold register") { coldCalled += 1 }
 
         var hotCalled = 0
-        engine.listen<MyEvent>("hot register", on_event) { hotCalled += 1 }
-        engine.listen<MyEvent>("hot register", on_event) { hotCalled += 1 }
+        engine.listen<MyEvent>("hot register") { hotCalled += 1 }
+        engine.listen<MyEvent>("hot register") { hotCalled += 1 }
+
+        engine.bindByDefault("cold register", on_trigger)
+        engine.bindByDefault("hot register", on_event)
 
         val changelog = engine.createChangelog()
 

@@ -4,29 +4,27 @@ import trikered.BindingType.on_event
 
 class Engine {
     private val registers = LinkedHashSet<Register>()
-    private var defaultConfigurations = mutableListOf<ChangelogConfigurationBuilder.() -> Unit>(
-            { "default" bindedAs on_event })
+    private val defaultBindings = Bindings().apply {
+        add(Binding(on_event, getOrCreateRegister("default")))
+    }
 
-    @JvmOverloads inline fun <reified T : Event> listen(
-            registerName: String = "default",
-            type: BindingType? = null,
-            noinline listener: (T) -> Unit) =
-            listen(T::class.java, registerName, type, listener)
+    @JvmOverloads
+    inline fun <reified T : Event> listen(registerName: String = "default", noinline listener: (T) -> Unit) =
+            listen(T::class.java, registerName, listener)
 
-    @JvmOverloads fun <T : Event> listen(
-            eventClass: Class<T>,
-            registerName: String = "default",
-            type: BindingType? = null,
-            listener: (T) -> Unit) = apply {
+    @JvmOverloads
+    fun <T : Event> listen(eventClass: Class<T>, registerName: String = "default", listener: (T) -> Unit) = apply {
         getOrCreateRegister(registerName).addListener(eventClass, listener)
-        if (type != null) defaultConfigurations.add { registerName bindedAs type }
     }
 
     fun createChangelog(configuration: ChangelogConfigurationBuilder.() -> Unit = { bindDefault() }) =
-            ChangelogConfigurationBuilder(this) { defaultConfigurations.forEach { it() } }
+            ChangelogConfigurationBuilder(this, defaultBindings)
                     .apply(configuration)
                     .createChangelog(registers.toList())
 
+    fun bindByDefault(registerName: String, type: BindingType) {
+        defaultBindings.add(Binding(type, getOrCreateRegister(registerName)))
+    }
 
     internal fun bindingFor(registerName: String, type: BindingType) =
             Binding(type, getOrCreateRegister(registerName))

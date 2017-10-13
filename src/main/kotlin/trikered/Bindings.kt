@@ -6,7 +6,11 @@ class Bindings {
 
     fun registersThat(filter: (Binding) -> Boolean) = bindings.filter(filter).map { it.register }
 
-    operator fun plusAssign(binding: Binding) {
+    fun add(bindings: Bindings) {
+        this.bindings += bindings.bindings
+    }
+
+    fun add(binding: Binding) {
         bindings += binding
     }
 }
