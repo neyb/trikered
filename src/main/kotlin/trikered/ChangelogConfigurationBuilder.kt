@@ -7,8 +7,12 @@ class ChangelogConfigurationBuilder(private val engine: Engine, private val defa
         bindings.add(defaultBinding)
     }
 
-    infix fun String.bindedAs(type: BindingType) {
-        bindings.add(engine.bindingFor(this, type))
+    infix fun BindingType.bind(registerName: String) {
+        bindings.add(Binding(this, engine.getOrCreateRegister(registerName)))
+    }
+
+    infix fun unbind(registerName: String) {
+        bindings.remove { it.register.name == registerName }
     }
 
     internal fun createChangelog(registers: List<Register>) = Changelog(bindings, registers)

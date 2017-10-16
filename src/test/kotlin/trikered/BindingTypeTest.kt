@@ -15,7 +15,7 @@ class BindingTypeTest {
         engine.listen<MyEvent> { called = true }
 
         val changelog = engine.createChangelog {
-            "default" bindedAs on_trigger
+            on_trigger bind "default"
         }
 
         changelog.add(MyEvent())
@@ -30,7 +30,7 @@ class BindingTypeTest {
         engine.listen<MyEvent> { called += 1 }
 
         val changelog = engine.createChangelog {
-            "default" bindedAs on_trigger
+            on_trigger bind "default"
         }
 
         changelog.add(MyEvent())
@@ -54,8 +54,8 @@ class BindingTypeTest {
         engine.listen<MyEvent>("hot register") { hotCalled += 1 }
 
         val changelog = engine.createChangelog {
-            "cold register" bindedAs on_trigger
-            "hot register" bindedAs on_event
+            on_trigger bind "cold register"
+            on_event bind "hot register"
         }
 
         changelog.add(MyEvent())
@@ -102,6 +102,44 @@ class BindingTypeTest {
         changelog.trigger("register1")
 
         calls shouldEqual listOf("listener1")
+    }
 
+    @Test fun `can use default without a specific register`() {
+        val calls = mutableListOf<String>()
+
+        engine.listen<MyEvent> { calls += "listener1" }
+        engine.listen<MyEvent>("other register") { calls += "other" }
+        engine.bindByDefault("other register", on_event)
+
+        val changelog = engine.createChangelog {
+            bindDefault()
+            unbind("default")
+        }
+
+        changelog.add(MyEvent())
+
+        calls shouldEqual listOf("other")
+    }
+
+    @Test fun `adding twice the same default binding should register it only once`() {
+        val calls = mutableListOf<String>()
+
+        engine.listen<MyEvent>("r") { calls += "tick" }
+        engine.bindByDefault("r", on_event)
+        engine.bindByDefault("r", on_event)
+        engine.bindByDefault("r", on_trigger)
+        engine.bindByDefault("r", on_trigger)
+
+        val changelog = engine.createChangelog()
+
+        changelog.add(MyEvent())
+
+        calls shouldEqual listOf("tick")
+
+        calls.clear()
+
+        changelog.trigger()
+
+        calls shouldEqual listOf("tick")
     }
 }

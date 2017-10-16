@@ -26,10 +26,7 @@ class Engine {
         defaultBindings.add(Binding(type, getOrCreateRegister(registerName)))
     }
 
-    internal fun bindingFor(registerName: String, type: BindingType) =
-            Binding(type, getOrCreateRegister(registerName))
-
-    private fun getOrCreateRegister(registerName: String) =
+    internal fun getOrCreateRegister(registerName: String) =
             registers.firstOrNull { it.name == registerName } ?: createRegister(registerName)
 
     private fun createRegister(registerName: String) = Register(registerName).also { registers += it }

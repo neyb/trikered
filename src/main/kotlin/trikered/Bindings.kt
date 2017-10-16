@@ -13,4 +13,8 @@ class Bindings {
     fun add(binding: Binding) {
         bindings += binding
     }
+
+    fun remove(filter: (Binding) -> Boolean) {
+        bindings.removeIf(filter)
+    }
 }

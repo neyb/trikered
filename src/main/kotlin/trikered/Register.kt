@@ -6,7 +6,7 @@ class Register(val name: String) {
     @Suppress("UNCHECKED_CAST")
     fun <T : Event> addListener(javaClass: Class<T>, listener: (T) -> Unit) =
         listeners.computeIfAbsent(javaClass) { mutableListOf() }
-                .add(Listener(javaClass, listener) as Listener<Event>)
+                .add(Listener(listener) as Listener<Event>)
 
     fun trigger(event: Event) =
         listeners.asSequence()

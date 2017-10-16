@@ -1,7 +1,6 @@
 package trikered
 
-class Listener<T : Event>(
-        val javaClass: Class<T>,
+class Listener<in T : Event>(
         private val function: (T) -> Unit
 ) {
     fun trigger(event: T) {
